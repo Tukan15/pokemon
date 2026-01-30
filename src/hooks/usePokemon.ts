@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { fetchPokemonTypes, fetchPokemonsByType } from "@/services/pokemonService";
 import { usePokemonContext } from "@/context/PokemonContext";
-import { PokemonType, PokemonCategory } from "@/types/pokemon";
 
 export const usePokemon = () => {
-  const [types, setTypes] = useState<PokemonCategory[]>([]);
-  const [pokemons, setPokemons] = useState<PokemonType[]>([]);
   const [isLoadingTypes, setIsLoadingTypes] = useState(true);
   const [isLoadingPokemons, setIsLoadingPokemons] = useState(false);
 
@@ -13,11 +10,22 @@ export const usePokemon = () => {
     selectedType, 
     setSelectedType, 
     searchQuery, 
-    setSearchQuery 
+    setSearchQuery,
+    pokemons,
+    setPokemons,
+    loadedType,
+    setLoadedType,
+    types,
+    setTypes   
   } = usePokemonContext();
 
   useEffect(() => {
     const getTypes = async () => {
+      if (types.length > 0) {
+        setIsLoadingTypes(false);
+        return;
+      }
+      
       try {
         const results = await fetchPokemonTypes();
         setTypes(results);
@@ -28,19 +36,23 @@ export const usePokemon = () => {
       }
     };
     getTypes();
-  }, []);
+  }, []); 
 
   useEffect(() => {
     const fetchPokemons = async () => {
       if (!selectedType) {
         setPokemons([]);
+        setLoadedType("");
         return;
       }
-
+      if (pokemons.length > 0 && loadedType === selectedType) {
+        return; 
+      }
       setIsLoadingPokemons(true);
       try {
         const pokemonList = await fetchPokemonsByType(selectedType);
         setPokemons(pokemonList);
+        setLoadedType(selectedType);
       } catch (error) {
         console.error("Failed to load pokemons:", error);
       } finally {
@@ -49,7 +61,7 @@ export const usePokemon = () => {
     };
 
     fetchPokemons();
-  }, [selectedType]);
+  }, [selectedType]); 
 
   const handleTypeChange = (typeName: string) => {
     setSelectedType(typeName);

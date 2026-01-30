@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { PokemonCategory, PokemonType } from "@/types/pokemon";
 
 interface PokemonContextType {
   caughtPokemonNames: string[];
@@ -9,16 +10,25 @@ interface PokemonContextType {
   setSelectedType: (type: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  pokemons: PokemonType[];
+  setPokemons: (data: PokemonType[]) => void;
+  loadedType: string;
+  setLoadedType: (type: string) => void;
+  types: PokemonCategory[];
+  setTypes: (data: PokemonCategory[]) => void;
 }
 
 const PokemonContext = createContext<PokemonContextType | undefined>(undefined);
 
 export const PokemonProvider = ({ children }: { children: ReactNode }) => {
   const [caughtPokemonNames, setCaughtPokemonNames] = useState<string[]>([]);
-  
   const [selectedType, setSelectedType] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [pokemons, setPokemons] = useState<PokemonType[]>([]);
+  const [loadedType, setLoadedType] = useState<string>("");
   
+  const [types, setTypes] = useState<PokemonCategory[]>([]);
+
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -50,7 +60,13 @@ export const PokemonProvider = ({ children }: { children: ReactNode }) => {
       selectedType,
       setSelectedType,
       searchQuery,
-      setSearchQuery
+      setSearchQuery,
+      pokemons,
+      setPokemons,
+      loadedType,
+      setLoadedType,
+      types,
+      setTypes
     }}>
       {children}
     </PokemonContext.Provider>
